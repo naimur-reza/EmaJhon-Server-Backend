@@ -32,10 +32,13 @@ async function run() {
     });
 
     app.get("/products", async (req, res) => {
-      console.log(req.query);
+      const page = parseInt(req.query.page) || 0;
+      const limit = parseInt(req.query.limit) || 10;
+      const skip = page * limit;
       const result = await productCollection
         .find()
-
+        .skip(skip)
+        .limit(limit)
         .toArray();
       res.send(result);
     });
