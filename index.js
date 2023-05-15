@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const port = process.env.PORT || 5000;
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 // middle wares
 app.use(cors());
@@ -43,6 +43,14 @@ async function run() {
       res.send(result);
     });
 
+    app.post("/productsByIds", async (req, res) => {
+      const ids = req.body;
+      console.log(ids);
+      const objectIds = ids.map((id) => new ObjectId(id));
+      const query = { _id: { $in: objectIds } };
+      const result = await productCollection.find(query).toArray();
+      res.send(result);
+    });
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
