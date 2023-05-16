@@ -51,6 +51,23 @@ async function run() {
       const result = await productCollection.find(query).toArray();
       res.send(result);
     });
+
+    // CREATE SEARCH API FROM HERE
+    const indexKeys = { name: 1, category: 1 };
+    const indexOptions = { name: "titleCategory" };
+    const result = await productCollection.createIndex(indexKeys, indexOptions);
+    app.get("/products/:text", async (req, res) => {
+      const searchText = req.params.text;
+      const result = await productCollection
+        .find({
+          $or: [
+            { title: { $regex: searchText, $options: "i" } },
+            { category: { $regex: searchText, $options: "i" } },
+          ],
+        })
+        .toArray();
+      res.send(result);
+    });
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
